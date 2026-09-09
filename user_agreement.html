@@ -2785,16 +2785,8 @@
 			}
 
 			function notifyNativePageReady() {
-				/* LmaxPro bridge */
-				if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.prism_workshop_mix) {
-					window.webkit.messageHandlers.prism_workshop_mix.postMessage("");
-				}
 				callNative("setWebViewConfiguration", {
-					openScheme: [privacyPolicyUrl, supportUrl],
-					backgroundColor: getAppBackgroundColor(),
-					isAllowsBackForwardNavigationGestures: 0,
-					statusBarStyle: 1,
-					safeArea: 0,
+					backgroundColor: [0,0,0],
 				});
 				callNative("cancelLoading");
 			}
